@@ -42,5 +42,6 @@ was leveraged for defining how the gradient of the quantum circuit could be appr
 which was instrumental for applying backpropagation
 
 [Hybrid quantum-classical Neural Networks with PyTorch and Qiskit
-](https://qiskit.org/textbook/ch-machine-learning/machine-learning-qiskit-pytorch.html)
+](https://cocalc.com/github/quantum-kittens/platypus/blob/main/notebooks/ch-machine-learning/machine-learning-qiskit-pytorch.ipynb)
 provides a concrete implementation, from which the classical computing part of this algorithm is adapted
+> The listed link is a fair approximation for the original resource I referenced, however that URL is now dead, unfortunately. For posterity, the original (now dead) URL for this reference was: https://qiskit.org/textbook/ch-machine-learning/machine-learning-qiskit-pytorch.html

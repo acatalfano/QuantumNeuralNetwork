@@ -1,21 +1,23 @@
 namespace My.QNN {
-    open Microsoft.Quantum.Arithmetic;
-    open Microsoft.Quantum.Diagnostics;
-    open Microsoft.Quantum.Preparation;
-    open Microsoft.Quantum.Intrinsic;
-    open Microsoft.Quantum.Math;
-    open Microsoft.Quantum.Measurement;
-    open Microsoft.Quantum.Convert;
-    open Microsoft.Quantum.Arrays;
-    open Microsoft.Quantum.Canon;
+    open Std.Math;
 
-    // @EntryPoint()
-    // operation QNN() : Unit {
-    //     //
+    import Std.Convert.IntAsDouble;
+    import Std.StatePreparation.PreparePureStateD;
+    import Std.Arrays.Reversed;
+
+    @EntryPoint()
+    operation QNN() : Unit {
+        // TODO: stuff needs to happen here, in this main entry-point.
+        //          ...Stuff bigger than "Hello quantum world!"
 
 
-    //     Message("Hello quantum world!");
-    // }
+        Message("Hello quantum world!");
+    }
+
+    // TODO: when I try to use this type, it annoys the LittleEndian-oriented functions
+    //          can I add the right wrappers to provide "LittleEndian vs BigEndian" type safety?
+    //          both for OPERATORS and REGISTERS???
+    // newtype LittleEndian = Qubit[];
 
     /// The full qnn circuit
     ///
@@ -53,25 +55,25 @@ namespace My.QNN {
         // issue with DoubleAsInt() when run through the python simulator
         let numQubits = Ceiling(dblNumQubits);
 
-        use qs = Qubit[numQubits];
-        let qRegister = LittleEndian(qs);
+        use bigEndianQuantumRegister = Qubit[numQubits];
+        // let qRegister = LittleEndian(qs);
 
-        Message("featureVector length" + IntAsString(Length(featureVector)));
+        Message($"featureVector length {Length(featureVector)}");
 
-        Message("numQubits length" + IntAsString(numQubits));
+        Message($"numQubits {numQubits}");
         // encode features as amplitudes
-        PrepareArbitraryStateD(featureVector, qRegister);
+        PreparePureStateD(featureVector, bigEndianQuantumRegister);
 
         // apply the LayerParams
         for layerParams in allLayersParams {
-            ConvolutionalLayer(layerParams, qs);
+            ConvolutionalLayer(layerParams, bigEndianQuantumRegister);
         }
 
-        // measure
-        let result = MeasureInteger(qRegister);
+        // measure (expects little-endian array of qubits)
+        let result = MeasureInteger(Reversed(bigEndianQuantumRegister));
 
         // cleanup
-        ResetAll(qs);
+        ResetAll(bigEndianQuantumRegister);
 
         // return measurement
         return result;
@@ -134,10 +136,8 @@ namespace My.QNN {
         let exp_beta = gateParams::exp_beta;
         let exp_gamma = gateParams::exp_gamma;
 
-        Message("Generic gate with angle = " + DoubleAsString(angle)
-            + ", beta = " + DoubleAsString(exp_beta)
-            + ", gamma = " + DoubleAsString(exp_gamma)
-        );
+        Message($"Generic gate with angle = {angle}, beta = {exp_beta}, gamma = {exp_gamma}");
+
         Rz(-(exp_beta + exp_gamma), q);
         Ry(-2.0 * angle, q);
         Rz(exp_gamma - exp_beta, q);
@@ -172,30 +172,12 @@ namespace My.QNN {
 
         for i in 0..Length(theta) - 1 {
             let (a,b,c) = theta[i]!;
-            Message(
-                "run w/ theta"
-                + IntAsString(i)
-                + " = "
-                + DoubleAsString(a)
-                + ", "
-                + DoubleAsString(b)
-                + ", "
-                + DoubleAsString(c)
-            );
+            Message($"run w/ theta[{i}] = {a}, {b}, {c}");
         }
 
         for i in 0..Length(controlledTheta) - 1 {
             let (a,b,c) = controlledTheta[i]!;
-            Message(
-                "run w/ controlledtheta"
-                + IntAsString(i)
-                + " = "
-                + DoubleAsString(a)
-                + ", "
-                + DoubleAsString(b)
-                + ", "
-                + DoubleAsString(c)
-            );
+            Message($"run w/ controlledTheta[{i}] = {a}, {b}, {c}");
         }
         // apply the single-qubit gates
         for idx in 0..Length(qs) - 1 {

@@ -2,3 +2,7 @@
 obj/
 .git/
 *.zip
+bin/
+.mypy_cache/
+.vs/
+__private__/
